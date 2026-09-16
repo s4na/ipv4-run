@@ -141,9 +141,17 @@ python3 -m unittest discover -s tests -v
 
 実際のSDKの更新後は `ipv4-run gcloud version` と、利用権限のある読み取り専用APIコマンドでも動作確認してください。トークンが出力される可能性があるため、認証時のdebugログをそのまま公開しないでください。
 
-## リリースとHomebrewの更新（メンテナー向け）
+## 自動パッチリリース
 
-1. テスト済みのコミットに `vX.Y.Z` タグを付け、タグとGitHub Releaseを公開します。公開済みのタグは移動しないでください。
-2. タグのソースアーカイブを取得してSHA-256を計算し、通常版 `Formula/ipv4-run.rb` の `url` と `sha256` を更新します。
-3. 同じURL・チェックサムの `Formula/ipv4-run@X.Y.Z.rb` を追加します。Homebrewの命名規則に合わせたクラス名と `keg_only :versioned_formula` を使い、`head` は定義しません。既存のバージョン付きformulaのソース指定は変更しません。
-4. READMEの提供バージョンと、Homebrew CIのバージョン指定を更新します。PRで通常版・バージョン指定版のインストールと `brew test` の成功を確認してマージします。
+mainへのPRマージごとにGitHub Actionsの `Patch release` が起動し、パッチ番号を1つ上げます（例: `0.1.0` → `0.1.1`）。ドキュメントだけのPRも対象です。
+
+1. 未処理のマージ済みPRをmainの履歴順に確認し、各マージコミットに `vX.Y.Z` タグを作成します。
+2. ソースアーカイブのSHA-256を計算し、通常版formula、対応する `ipv4-run@X.Y.Z`、README、処理記録 `.release-state.json` を更新します。既存の固定版は保持します。
+3. Pythonテストと、実際のHomebrewインストール・テストを実行します。
+4. `github-actions[bot]` が更新をmainにコミット・pushし、GitHub Releaseを公開します。
+
+自動更新コミットはPRマージではないため、リリースを再発火しません。組み込みの `GITHUB_TOKEN` を使い、PATの追加は不要です。mainへのbotの直接pushが許可されている必要があります。
+
+同時実行は直列化し、未処理PRもまとめて回収します。再実行では処理済みPRの番号を上げ直しません。途中失敗時はActionsの該当runを再実行するか、mainで `Patch release` を手動実行してください。作成済みタグは再利用し、異なるコミットへの付け替えは拒否します。テスト失敗時はタグだけ残ることがありますが、formula更新のpushとRelease公開は行いません。
+
+自動化導入前のPRは対象外です。メジャー・マイナーバージョンの変更はこの自動化の対象外です。
