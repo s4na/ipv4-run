@@ -1,3 +1,5 @@
+require "shellwords"
+
 class Ipv4Run < Formula
   desc "Run gcloud with IPv4-only Python networking without changing OS settings"
   homepage "https://github.com/s4na/ipv4-run"
@@ -7,9 +9,12 @@ class Ipv4Run < Formula
 
   def install
     libexec.install "bin", "libexec"
-    inreplace libexec/"bin/ipv4-run", "#!/usr/bin/env python3",
-              "#!#{Formula["python@3.14"].opt_bin}/python3.14"
-    bin.install_symlink libexec/"bin/ipv4-run"
+    launcher = (libexec/"libexec/ipv4-run-homebrew.sh").read
+    launcher = launcher.gsub("@FALLBACK_PYTHON@") { (Formula["python@3.14"].opt_bin/"python3.14").to_s.shellescape }
+    launcher = launcher.gsub("@CLI@") { (libexec/"bin/ipv4-run").to_s.shellescape }
+    bin.mkpath
+    (bin/"ipv4-run").write launcher
+    (bin/"ipv4-run").chmod 0755
   end
 
   test do
