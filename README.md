@@ -12,7 +12,7 @@ ipv4-run gcloud projects list
 | 項目 | 要件 |
 | --- | --- |
 | OS | macOS / Linux。Windowsは対応対象外です。CIでは `macos-latest` / `ubuntu-latest` で検証しています。 |
-| ラッパー用Python | Python 3.10以上。ソースから使う場合は `python3` としてPATH上で実行できる必要があります。追加のpipパッケージは不要です。 |
+| ラッパー用Python | Python 3.10以上。システム・Homebrew・miseなど、導入方法は問いません。ソースから使う場合は `python3` としてPATH上で実行できる必要があります。追加のpipパッケージは不要です。 |
 | Google Cloud CLI | 通常のPython版Google Cloud SDKを別途インストールし、`gcloud` をPATHに追加してください。SDK内に `bin/gcloud` と `lib/gcloud.py` がある構成が必要です。実機での起動確認済みバージョンは585.0.0です。 |
 | gcloud用Python | インストールしたGoogle Cloud CLIが対応するPythonが必要です。SDK自身が選択するPython（同梱Pythonや `CLOUDSDK_PYTHON` による指定）を使うため、ラッパー用Pythonとは別の場合があります。 |
 | ネットワーク | 利用するGoogle Cloud APIなどにIPv4で接続できることが必要です。このツールはIPv4接続自体の不具合を解消するものではありません。 |
@@ -48,7 +48,30 @@ cd ipv4-run
 
 `bin` と `libexec` の配置を保ってください。`bin/ipv4-run` のシンボリックリンクをPATH上に置くこともできます。gcloudは別途インストールし、PATHに追加してください。
 
-### Homebrew（mainへのマージ後）
+### mise管理のPythonで使う
+
+ソース版の起動には `#!/usr/bin/env python3` を使っているため、PATH上の `python3` がmise管理のPythonなら、そのまま利用できます。miseでPython 3.10以上を選択し、[シェルで有効化](https://mise.jdx.dev/cli/activate.html)している場合、起動コマンドは通常と同じです。
+
+```sh
+# 上記の手順でcloneしたipv4-runディレクトリ内で実行
+python3 --version
+./bin/ipv4-run gcloud version
+```
+
+シェルの有効化に依存せず実行するには、[mise exec](https://mise.jdx.dev/dev-tools/)を使います。以下はmiseで選択済みのPythonを使う例です。
+
+```sh
+mise exec -- python3 --version
+mise exec -- ./bin/ipv4-run gcloud version
+```
+
+これはラッパー用Pythonの選択です。gcloud用Pythonは引き続きSDKに選択を任せます。gcloudにもmise管理のPythonを指定する場合は、そのバージョンが利用中のGoogle Cloud CLIに対応していることを確認し、コマンド単位で指定できます。
+
+```sh
+mise exec -- sh -c 'CLOUDSDK_PYTHON="$(command -v python3)" ./bin/ipv4-run gcloud version'
+```
+
+### Homebrew
 
 このリポジトリ自身を明示的なURLでtapとして登録します。初版は未リリースのため、HEAD版のみです。
 
@@ -56,6 +79,8 @@ cd ipv4-run
 brew tap s4na/ipv4-run https://github.com/s4na/ipv4-run.git
 brew install --HEAD s4na/ipv4-run/ipv4-run
 ```
+
+Homebrew版のラッパーはformulaで指定したHomebrewのPythonを使います。mise管理のPythonでラッパーを動かしたい場合は、上記のソース版を利用してください。
 
 削除する場合：
 
