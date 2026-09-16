@@ -7,11 +7,31 @@ ipv4-run gcloud auth login
 ipv4-run gcloud projects list
 ```
 
+## 必要な環境
+
+| 項目 | 要件 |
+| --- | --- |
+| OS | macOS / Linux。Windowsは対応対象外です。CIでは `macos-latest` / `ubuntu-latest` で検証しています。 |
+| ラッパー用Python | Python 3.10以上。ソースから使う場合は `python3` としてPATH上で実行できる必要があります。追加のpipパッケージは不要です。 |
+| Google Cloud CLI | 通常のPython版Google Cloud SDKを別途インストールし、`gcloud` をPATHに追加してください。SDK内に `bin/gcloud` と `lib/gcloud.py` がある構成が必要です。実機での起動確認済みバージョンは585.0.0です。 |
+| gcloud用Python | インストールしたGoogle Cloud CLIが対応するPythonが必要です。SDK自身が選択するPython（同梱Pythonや `CLOUDSDK_PYTHON` による指定）を使うため、ラッパー用Pythonとは別の場合があります。 |
+| ネットワーク | 利用するGoogle Cloud APIなどにIPv4で接続できることが必要です。このツールはIPv4接続自体の不具合を解消するものではありません。 |
+
+ソースから取得する場合はGit、Homebrewで導入する場合はHomebrewが必要です。Homebrew版はラッパー用の `python@3.14` を依存関係として導入しますが、Google Cloud CLIは導入しません。ラッパー自体にGoogle Cloudアカウントは不要ですが、認証が必要なgcloudコマンドには通常どおりアカウントと権限が必要です。
+
+導入前に、次のコマンドでPythonとGoogle Cloud CLIを確認できます（Homebrew版ではラッパー用Pythonの手動準備は不要です）。
+
+```sh
+python3 --version  # ソースから使う場合: 3.10以上
+gcloud version
+```
+
+Go版gcloud（`CLOUDSDK_USE_GOCLOUD` を設定した構成）、独自の起動スクリプトやシェル関数、カスタム `CLOUDSDK_PYTHON_ARGS` は対応外です。
+
 ## 対応範囲
 
 - 初版はGoogle Cloud CLIの通常のPython版 `bin/gcloud` 専用です。任意のコマンドを制限するツールではありません。
-- macOS / Linux、ラッパー用Python 3.10以上が必要です。gcloudには、SDK自身が選択したPythonを使います。
-- gcloud 585.0.0で起動を確認しています。SDKの内部起動方式に依存する非公式の回避策です。
+- SDKの内部起動方式に依存する非公式の回避策です。
 - 標準入力・出力・エラー、引数、終了コード、シグナルを引き継ぎます。ブラウザでの本人確認は通常どおり必要です。
 - `gcloud` が別プロセスで実行するSSH、ブラウザ、gsutil等には制限が及びません。ネイティブ拡張などPythonのsocket APIを使わない通信も対象外です。
 - セキュリティ境界や通信遮断の保証を提供するツールではありません。通常の `gcloud` や他のアプリの動作は変更しません。
