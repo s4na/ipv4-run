@@ -73,10 +73,32 @@ mise exec -- sh -c 'CLOUDSDK_PYTHON="$(command -v python3)" ./bin/ipv4-run gclou
 
 ### Homebrew
 
-このリポジトリ自身を明示的なURLでtapとして登録します。初版は未リリースのため、HEAD版のみです。
+このリポジトリ自身を明示的なURLでtapとして登録します。通常は安定版をインストールできます。
 
 ```sh
 brew tap s4na/ipv4-run https://github.com/s4na/ipv4-run.git
+brew install s4na/ipv4-run/ipv4-run
+```
+
+バージョンを完全に固定する場合は、バージョン付きformulaを指定します。現在は **0.1.0** を提供しています。
+
+```sh
+brew install s4na/ipv4-run/ipv4-run@0.1.0
+"$(brew --prefix s4na/ipv4-run/ipv4-run@0.1.0)/bin/ipv4-run" gcloud version
+```
+
+バージョン付きformulaは通常版と共存できるよう、自動ではPATHにリンクしません。普段使うバージョンにする場合は、その `bin` をPATHの先頭に追加してください。
+
+```sh
+export PATH="$(brew --prefix s4na/ipv4-run/ipv4-run@0.1.0)/bin:$PATH"
+ipv4-run gcloud version
+```
+
+`@0.1.0` は0.1.0のソースに固定され、通常版の更新には追従しません。任意の過去バージョンを自動取得する仕組みではなく、tapに用意したバージョンだけ指定できます。Pythonなどの依存関係は固定されません。
+
+開発中のmainを使う場合は、引き続きHEAD版も選べます。
+
+```sh
 brew install --HEAD s4na/ipv4-run/ipv4-run
 ```
 
@@ -94,6 +116,8 @@ mise exec -- ipv4-run gcloud version
 
 ```sh
 brew uninstall ipv4-run
+# バージョン付きformulaを入れた場合はこちらも削除
+brew uninstall ipv4-run@0.1.0
 brew untap s4na/ipv4-run
 ```
 
@@ -116,3 +140,10 @@ python3 -m unittest discover -s tests -v
 テストは外部アカウント不要です。SDKを模した起動スクリプトとローカルのIPv4サーバーで、名前解決・通信、IPv6拒否、空文字や空白を含む引数、標準入力、終了コード、SIGINT/SIGTERM、未対応コマンドの拒否を確認します。
 
 実際のSDKの更新後は `ipv4-run gcloud version` と、利用権限のある読み取り専用APIコマンドでも動作確認してください。トークンが出力される可能性があるため、認証時のdebugログをそのまま公開しないでください。
+
+## リリースとHomebrewの更新（メンテナー向け）
+
+1. テスト済みのコミットに `vX.Y.Z` タグを付け、タグとGitHub Releaseを公開します。公開済みのタグは移動しないでください。
+2. タグのソースアーカイブを取得してSHA-256を計算し、通常版 `Formula/ipv4-run.rb` の `url` と `sha256` を更新します。
+3. 同じURL・チェックサムの `Formula/ipv4-run@X.Y.Z.rb` を追加します。Homebrewの命名規則に合わせたクラス名と `keg_only :versioned_formula` を使い、`head` は定義しません。既存のバージョン付きformulaのソース指定は変更しません。
+4. READMEの提供バージョンと、Homebrew CIのバージョン指定を更新します。PRで通常版・バージョン指定版のインストールと `brew test` の成功を確認してマージします。

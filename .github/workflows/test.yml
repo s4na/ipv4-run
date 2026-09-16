@@ -17,3 +17,19 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - run: python -m unittest discover -s tests -v
+
+  homebrew:
+    runs-on: macos-latest
+    env:
+      HOMEBREW_NO_AUTO_UPDATE: "1"
+      HOMEBREW_NO_INSTALL_CLEANUP: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install and test stable and pinned formulae
+        run: |
+          brew tap-new --no-git codex/ipv4-run-ci
+          cp Formula/*.rb "$(brew --repository codex/ipv4-run-ci)/Formula/"
+          brew install --build-from-source codex/ipv4-run-ci/ipv4-run
+          brew test codex/ipv4-run-ci/ipv4-run
+          brew install --build-from-source codex/ipv4-run-ci/ipv4-run@0.1.0
+          brew test codex/ipv4-run-ci/ipv4-run@0.1.0
