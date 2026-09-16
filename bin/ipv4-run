@@ -1,0 +1,44 @@
+#!/usr/bin/env python3
+"""Run supported commands with IPv4-only Python sockets, without OS changes."""
+import os
+from pathlib import Path
+import shutil
+import sys
+
+
+def main():
+    args = sys.argv[1:]
+    if not args or args == ['--help']:
+        print('Usage: ipv4-run [--] gcloud [ARG ...]\n'
+              'Restricts Python sockets in gcloud only; subprocesses are not covered.')
+        return 0 if args else 2
+    if args[0] == '--':
+        args = args[1:]
+    if not args or Path(args[0]).name != 'gcloud':
+        raise ValueError('only gcloud is supported; other commands are not restricted')
+    command = shutil.which(args[0])
+    if not command:
+        raise ValueError('gcloud was not found on PATH')
+    entry = Path(command).resolve().parent.parent / 'lib' / 'gcloud.py'
+    if not entry.is_file():
+        raise ValueError('expected a Google Cloud SDK bin/gcloud installation')
+    if os.environ.get('CLOUDSDK_USE_GOCLOUD'):
+        raise ValueError('CLOUDSDK_USE_GOCLOUD is unsupported; Python gcloud is required')
+    if os.environ.get('CLOUDSDK_PYTHON_ARGS', '').strip():
+        raise ValueError('custom CLOUDSDK_PYTHON_ARGS are unsupported; unset them for this invocation')
+    bootstrap = Path(__file__).resolve().parent.parent / 'libexec' / 'ipv4_bootstrap.py'
+    env = os.environ.copy()
+    # The SDK shell launcher word-splits this value. Encode the source so the
+    # Python -c expression is exactly one shell word, including in spaced paths.
+    source = bootstrap.read_bytes().hex()
+    env['CLOUDSDK_PYTHON_ARGS'] = "-S -c exec(bytes.fromhex('" + source + "'))"
+    env['_IPV4_RUN_ENTRY'] = str(entry)
+    os.execvpe(command, [command, *args[1:]], env)
+
+
+if __name__ == '__main__':
+    try:
+        sys.exit(main())
+    except (ValueError, OSError) as error:
+        print(f'ipv4-run: {error}', file=sys.stderr)
+        sys.exit(2)
