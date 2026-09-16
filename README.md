@@ -17,7 +17,7 @@ ipv4-run gcloud projects list
 | gcloud用Python | インストールしたGoogle Cloud CLIが対応するPythonが必要です。SDK自身が選択するPython（同梱Pythonや `CLOUDSDK_PYTHON` による指定）を使うため、ラッパー用Pythonとは別の場合があります。 |
 | ネットワーク | 利用するGoogle Cloud APIなどにIPv4で接続できることが必要です。このツールはIPv4接続自体の不具合を解消するものではありません。 |
 
-ソースから取得する場合はGit、Homebrewで導入する場合はHomebrewが必要です。Homebrew版はラッパー用の `python@3.14` を依存関係として導入しますが、Google Cloud CLIは導入しません。ラッパー自体にGoogle Cloudアカウントは不要ですが、認証が必要なgcloudコマンドには通常どおりアカウントと権限が必要です。
+ソースから取得する場合はGit、Homebrewで導入する場合はHomebrewが必要です。Homebrew版はフォールバック用の `python@3.14` を依存関係として導入しますが、Google Cloud CLIは導入しません。ラッパー自体にGoogle Cloudアカウントは不要ですが、認証が必要なgcloudコマンドには通常どおりアカウントと権限が必要です。
 
 導入前に、次のコマンドでPythonとGoogle Cloud CLIを確認できます（Homebrew版ではラッパー用Pythonの手動準備は不要です）。
 
@@ -80,7 +80,15 @@ brew tap s4na/ipv4-run https://github.com/s4na/ipv4-run.git
 brew install --HEAD s4na/ipv4-run/ipv4-run
 ```
 
-Homebrew版のラッパーはformulaで指定したHomebrewのPythonを使います。mise管理のPythonでラッパーを動かしたい場合は、上記のソース版を利用してください。
+Homebrew版も、PATH上の `python3`（mise管理のPythonを含む）がPython 3.10以上で起動できれば優先して使います。`python3` が見つからない、バージョンが古い、miseのshimが未設定などで起動できない場合は、依存関係として導入したHomebrewのPythonにフォールバックします。miseのPythonが有効なシェルなら、通常どおり実行できます。
+
+```sh
+ipv4-run gcloud version
+# シェルでmiseを有効化していない場合（miseでPythonを選択済み）
+mise exec -- ipv4-run gcloud version
+```
+
+この選択はラッパー用Pythonだけに適用します。gcloud用Pythonは引き続きSDKが選択します。
 
 削除する場合：
 
