@@ -80,21 +80,21 @@ brew tap s4na/ipv4-run https://github.com/s4na/ipv4-run.git
 brew install s4na/ipv4-run/ipv4-run
 ```
 
-バージョンを完全に固定する場合は、バージョン付きformulaを指定します。現在は **0.1.0** を提供しています。
+バージョンを完全に固定する場合は、バージョン付きformulaを指定します。現在は **0.1.1** を提供しています。
 
 ```sh
-brew install s4na/ipv4-run/ipv4-run@0.1.0
-"$(brew --prefix s4na/ipv4-run/ipv4-run@0.1.0)/bin/ipv4-run" gcloud version
+brew install s4na/ipv4-run/ipv4-run@0.1.1
+"$(brew --prefix s4na/ipv4-run/ipv4-run@0.1.1)/bin/ipv4-run" gcloud version
 ```
 
 バージョン付きformulaは通常版と共存できるよう、自動ではPATHにリンクしません。普段使うバージョンにする場合は、その `bin` をPATHの先頭に追加してください。
 
 ```sh
-export PATH="$(brew --prefix s4na/ipv4-run/ipv4-run@0.1.0)/bin:$PATH"
+export PATH="$(brew --prefix s4na/ipv4-run/ipv4-run@0.1.1)/bin:$PATH"
 ipv4-run gcloud version
 ```
 
-`@0.1.0` は0.1.0のソースに固定され、通常版の更新には追従しません。任意の過去バージョンを自動取得する仕組みではなく、tapに用意したバージョンだけ指定できます。Pythonなどの依存関係は固定されません。
+`@0.1.1` は0.1.1のソースに固定され、通常版の更新には追従しません。任意の過去バージョンを自動取得する仕組みではなく、tapに用意したバージョンだけ指定できます。Pythonなどの依存関係は固定されません。
 
 開発中のmainを使う場合は、引き続きHEAD版も選べます。
 
@@ -117,7 +117,7 @@ mise exec -- ipv4-run gcloud version
 ```sh
 brew uninstall ipv4-run
 # バージョン付きformulaを入れた場合はこちらも削除
-brew uninstall ipv4-run@0.1.0
+brew uninstall ipv4-run@0.1.1
 brew untap s4na/ipv4-run
 ```
 

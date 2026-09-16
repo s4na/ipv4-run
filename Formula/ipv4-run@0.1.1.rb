@@ -1,11 +1,11 @@
 require "shellwords"
 
-class Ipv4Run < Formula
+class Ipv4RunAT011 < Formula
   desc "Run gcloud with IPv4-only Python networking without changing OS settings"
   homepage "https://github.com/s4na/ipv4-run"
   url "https://github.com/s4na/ipv4-run/archive/refs/tags/v0.1.1.tar.gz"
   sha256 "eb144e34063902c76b40f014cf96a161e60919bd5eb17175bfe9ec4a8a5094f8"
-  head "https://github.com/s4na/ipv4-run.git", branch: "main"
+  keg_only :versioned_formula
 
   depends_on "python@3.14"
 

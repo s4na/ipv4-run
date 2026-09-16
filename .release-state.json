@@ -1,5 +1,10 @@
 {
   "baseline": "47a515a838112caa9d3c3857780ae0e25c0fd322",
-  "version": "0.1.0",
-  "releases": {}
+  "version": "0.1.1",
+  "releases": {
+    "6": {
+      "version": "0.1.1",
+      "sha": "12ddd441e5518fbb2abf0dec893376b0f52af15a"
+    }
+  }
 }
