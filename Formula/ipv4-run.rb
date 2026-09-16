@@ -12,6 +12,7 @@ class Ipv4Run < Formula
     launcher = (libexec/"libexec/ipv4-run-homebrew.sh").read
     launcher = launcher.gsub("@FALLBACK_PYTHON@") { (Formula["python@3.14"].opt_bin/"python3.14").to_s.shellescape }
     launcher = launcher.gsub("@CLI@") { (libexec/"bin/ipv4-run").to_s.shellescape }
+    bin.mkpath
     (bin/"ipv4-run").write launcher
     (bin/"ipv4-run").chmod 0755
   end
